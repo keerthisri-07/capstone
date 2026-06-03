@@ -33,6 +33,7 @@ from app.models.notification import Notification
 from app.schemas.auth import (
     RegisterRequest,
     LoginRequest,
+    GoogleLoginRequest,
     TokenResponse,
     RefreshRequest,
     OTPVerifyRequest,
@@ -40,6 +41,9 @@ from app.schemas.auth import (
     ResetPasswordRequest,
     MessageResponse,
 )
+
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -168,6 +172,91 @@ async def login(payload: LoginRequest):
         user_id=user_id,
         role=user.role,
     )
+
+
+# ── Google Login ──────────────────────────────────────────────────────────────
+
+@router.post("/google", response_model=TokenResponse)
+async def google_login(payload: GoogleLoginRequest):
+    """
+    Authenticate a user via Google Sign-In and return JWT tokens.
+    """
+    try:
+        # In a real app, you would pass client_id=settings.GOOGLE_CLIENT_ID
+        # Here we disable audience verification if GOOGLE_CLIENT_ID is not set
+        client_id = getattr(settings, "GOOGLE_CLIENT_ID", None)
+        if client_id:
+            idinfo = id_token.verify_oauth2_token(
+                payload.credential, google_requests.Request(), client_id
+            )
+        else:
+            # Mock mode or demo mode if no client ID is set
+            from jose import jwt
+            # Decodes without verification for demo purposes
+            idinfo = jwt.decode(payload.credential, "", options={"verify_signature": False})
+            
+        email = idinfo.get("email")
+        if not email:
+            raise ValueError("No email in token")
+            
+        user = await User.find_one(User.email == email)
+        
+        if not user:
+            # Create a new user automatically
+            base_username = email.split("@")[0].lower()
+            username = base_username
+            counter = 1
+            while await User.find_one(User.username == username):
+                username = f"{base_username}{counter}"
+                counter += 1
+                
+            user = User(
+                email=email,
+                username=username,
+                full_name=idinfo.get("name", username),
+                password_hash=hash_password("google_oauth_dummy_password"),
+                role="user",
+                is_verified=True, # Google emails are pre-verified
+                profile_picture=idinfo.get("picture")
+            )
+            await user.insert()
+            
+            # Create welcome notification
+            notification = Notification(
+                user_id=str(user.id),
+                type="system",
+                title="Welcome to Safety Companion!",
+                message=f"Hi {user.full_name}, your account was created successfully via Google.",
+                metadata={"action_url": "/dashboard"},
+            )
+            await notification.insert()
+            
+        elif not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Account is inactive. Please contact support.",
+            )
+
+        # Update last login
+        user.last_login = datetime.now(timezone.utc)
+        await user.save()
+
+        user_id = str(user.id)
+        access_token = create_access_token(subject=user_id, role=user.role)
+        refresh_token = create_refresh_token(subject=user_id)
+
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+            user_id=user_id,
+            role=user.role,
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Google authentication failed: {str(e)}",
+        )
 
 
 # ── Refresh Token ─────────────────────────────────────────────────────────────

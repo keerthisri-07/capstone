@@ -43,6 +43,12 @@ class LoginRequest(BaseModel):
     password: str = Field(..., description="Account password")
 
 
+class GoogleLoginRequest(BaseModel):
+    """Schema for Google Sign-In."""
+    
+    credential: str = Field(..., description="Google ID Token JWT")
+
+
 class TokenResponse(BaseModel):
     """Schema for successful authentication token response."""
 

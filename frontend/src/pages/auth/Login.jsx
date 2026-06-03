@@ -16,10 +16,58 @@ const FEATURES = [
   { icon: Users, text: 'Guardian network management' },
 ]
 
+const MockGoogleLogin = ({ onSuccess, currentEmail }) => {
+  const handleMockLogin = () => {
+    let emailToUse = currentEmail;
+    
+    // If no email is typed in the form, show a popup to simulate Google account selection
+    if (!emailToUse) {
+      emailToUse = window.prompt("Google Sign-In Simulation:\n\nPlease enter your Gmail address:", "keerthi@gmail.com");
+    }
+
+    // If user cancelled the prompt, do nothing
+    if (!emailToUse) return;
+
+    const namePrefix = emailToUse.split('@')[0]
+    // Capitalize first letter of name
+    const generatedName = namePrefix.charAt(0).toUpperCase() + namePrefix.slice(1)
+    
+    // Generate a simple unencrypted JWT with base64 for demo purposes
+    // Use valid base64url characters without padding
+    const header = btoa(JSON.stringify({ alg: 'none', typ: 'JWT' })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+    const payload = btoa(JSON.stringify({
+      email: emailToUse,
+      name: generatedName,
+      picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(generatedName)}`
+    })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+    const mockToken = `${header}.${payload}.`
+    onSuccess({ credential: mockToken })
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleMockLogin}
+      className="w-[360px] max-w-full bg-[#131314] text-[#e3e3e3] font-medium text-sm py-2 px-4 rounded border border-[#8e918f] hover:bg-[#1e1e1f] transition-colors flex items-center justify-center gap-3 h-[40px] shadow-sm"
+      style={{ fontFamily: 'Roboto, sans-serif' }}
+    >
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="w-5 h-5">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+        <path fill="none" d="M0 0h48v48H0z"></path>
+      </svg>
+      Continue with Google
+    </button>
+  )
+}
+
+
 const Login = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { login } = useAuth()
+  const { login, googleLogin } = useAuth()
 
   const [form, setForm] = useState({ email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
@@ -53,6 +101,23 @@ const Login = () => {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setIsLoading(true)
+    try {
+      const result = await googleLogin(credentialResponse.credential)
+      toast.success(`Welcome back, ${result.user?.name?.split(' ')[0] || 'there'}! 👋`)
+      setTimeout(() => navigate(from, { replace: true }), 300)
+    } catch (err) {
+      toast.error('Google sign-in failed. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleGoogleError = () => {
+    toast.error('Google sign-in was unsuccessful. Please try again.')
   }
 
   const fillDemo = (type) => {
@@ -328,6 +393,17 @@ const Login = () => {
                 )}
               </motion.button>
             </form>
+
+            <div className="mt-6 flex flex-col items-center gap-4">
+              <div className="flex items-center w-full">
+                <div className="flex-grow border-t border-gray-700/50"></div>
+                <span className="px-3 text-xs text-gray-500 uppercase font-semibold">Or continue with</span>
+                <div className="flex-grow border-t border-gray-700/50"></div>
+              </div>
+              <div className="w-full flex justify-center">
+                <MockGoogleLogin onSuccess={handleGoogleSuccess} currentEmail={form.email} />
+              </div>
+            </div>
 
             <p className="text-center text-sm text-gray-500 mt-6">
               Don't have an account?{' '}
