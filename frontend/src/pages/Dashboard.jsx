@@ -14,6 +14,7 @@ import { useAuthStore } from '../store/authStore'
 import SafetyScoreRing from '../components/ui/SafetyScoreRing'
 import MetricCard from '../components/ui/MetricCard'
 import StatusBadge from '../components/ui/StatusBadge'
+import AppLayout from '../components/layout/AppLayout'
 import {
   CURRENT_USER, MOCK_JOURNEYS, MOCK_SOS_EVENTS, MOCK_INCIDENTS,
   MOCK_GUARDIANS, MOCK_ACTIVITY, MOCK_RECOMMENDATIONS, MOCK_ANALYTICS
@@ -74,12 +75,13 @@ const Dashboard = () => {
   ]
 
   return (
-    <motion.div
-      variants={stagger}
-      initial="hidden"
-      animate="visible"
-      className="space-y-6 pb-20"
-    >
+    <AppLayout>
+      <motion.div
+        variants={stagger}
+        initial="hidden"
+        animate="visible"
+        className="space-y-6 pb-20"
+      >
       {/* ── Risk level banner ──────────────────────────────────── */}
       <motion.div
         variants={fadeUp}
@@ -377,6 +379,7 @@ const Dashboard = () => {
         </div>
       </motion.div>
     </motion.div>
+  </AppLayout>
   )
 }
 

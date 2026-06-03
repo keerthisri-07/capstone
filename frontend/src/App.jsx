@@ -138,11 +138,9 @@ const AppRoutes = () => {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <AppLayout>
-                <Suspense fallback={<PageSkeleton />}>
-                  <Dashboard />
-                </Suspense>
-              </AppLayout>
+              <Suspense fallback={<PageSkeleton />}>
+                <Dashboard />
+              </Suspense>
             </ProtectedRoute>
           }
         />
@@ -150,11 +148,9 @@ const AppRoutes = () => {
           path="/journey"
           element={
             <ProtectedRoute>
-              <AppLayout>
-                <Suspense fallback={<PageSkeleton />}>
-                  <JourneyMonitor />
-                </Suspense>
-              </AppLayout>
+              <Suspense fallback={<PageSkeleton />}>
+                <JourneyMonitor />
+              </Suspense>
             </ProtectedRoute>
           }
         />
@@ -162,11 +158,9 @@ const AppRoutes = () => {
           path="/sos"
           element={
             <ProtectedRoute>
-              <AppLayout>
-                <Suspense fallback={<PageSkeleton />}>
-                  <SOSCenter />
-                </Suspense>
-              </AppLayout>
+              <Suspense fallback={<PageSkeleton />}>
+                <SOSCenter />
+              </Suspense>
             </ProtectedRoute>
           }
         />
@@ -174,11 +168,9 @@ const AppRoutes = () => {
           path="/assistant"
           element={
             <ProtectedRoute>
-              <AppLayout>
-                <Suspense fallback={<PageSkeleton />}>
-                  <AIAssistant />
-                </Suspense>
-              </AppLayout>
+              <Suspense fallback={<PageSkeleton />}>
+                <AIAssistant />
+              </Suspense>
             </ProtectedRoute>
           }
         />
@@ -186,11 +178,9 @@ const AppRoutes = () => {
           path="/incidents"
           element={
             <ProtectedRoute>
-              <AppLayout>
-                <Suspense fallback={<PageSkeleton />}>
-                  <IncidentReports />
-                </Suspense>
-              </AppLayout>
+              <Suspense fallback={<PageSkeleton />}>
+                <IncidentReports />
+              </Suspense>
             </ProtectedRoute>
           }
         />
@@ -198,11 +188,9 @@ const AppRoutes = () => {
           path="/guardians"
           element={
             <ProtectedRoute>
-              <AppLayout>
-                <Suspense fallback={<PageSkeleton />}>
-                  <Guardians />
-                </Suspense>
-              </AppLayout>
+              <Suspense fallback={<PageSkeleton />}>
+                <Guardians />
+              </Suspense>
             </ProtectedRoute>
           }
         />
@@ -210,11 +198,9 @@ const AppRoutes = () => {
           path="/analytics"
           element={
             <ProtectedRoute>
-              <AppLayout>
-                <Suspense fallback={<PageSkeleton />}>
-                  <Analytics />
-                </Suspense>
-              </AppLayout>
+              <Suspense fallback={<PageSkeleton />}>
+                <Analytics />
+              </Suspense>
             </ProtectedRoute>
           }
         />
@@ -222,11 +208,9 @@ const AppRoutes = () => {
           path="/profile"
           element={
             <ProtectedRoute>
-              <AppLayout>
-                <Suspense fallback={<PageSkeleton />}>
-                  <Profile />
-                </Suspense>
-              </AppLayout>
+              <Suspense fallback={<PageSkeleton />}>
+                <Profile />
+              </Suspense>
             </ProtectedRoute>
           }
         />
@@ -234,11 +218,9 @@ const AppRoutes = () => {
           path="/admin"
           element={
             <ProtectedRoute adminOnly>
-              <AppLayout>
-                <Suspense fallback={<PageSkeleton />}>
-                  <AdminDashboard />
-                </Suspense>
-              </AppLayout>
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminDashboard />
+              </Suspense>
             </ProtectedRoute>
           }
         />
