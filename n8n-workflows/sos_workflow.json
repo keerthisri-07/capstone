@@ -1,0 +1,104 @@
+{
+  "name": "SafeHer SOS Emergency Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "safeher-sos",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "SOS Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst now = new Date().toISOString();\nreturn [{\n  json: {\n    event_id: data.sos_id || 'SOS-' + Date.now(),\n    user_name: data.user_name || 'SafeHer User',\n    user_phone: data.user_phone || 'N/A',\n    location: data.location || { lat: 0, lng: 0, address: 'Unknown' },\n    message: data.message || 'Emergency SOS Activated',\n    timestamp: now,\n    emergency_type: data.emergency_type || 'SOS',\n    contacts: data.notified_contacts || [],\n    alert_message: `🚨 EMERGENCY ALERT\\n\\nUser: ${data.user_name}\\nTime: ${now}\\nLocation: ${data.location?.address || 'See coordinates'}\\nCoords: ${data.location?.lat}, ${data.location?.lng}\\n\\nThis is an automated SOS alert from SafeHer Platform.\\nPlease respond immediately.`\n  }\n}];"
+      },
+      "id": "create-emergency-event",
+      "name": "Create Emergency Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "alerts@safeher.ai",
+        "toEmail": "={{ $json.contacts.map(c => c.email).join(',') }}",
+        "subject": "🚨 EMERGENCY: {{ $json.user_name }} needs help!",
+        "text": "={{ $json.alert_message }}",
+        "options": {}
+      },
+      "id": "send-email",
+      "name": "Send Emergency Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "phoneNumberId": "YOUR_WHATSAPP_PHONE_NUMBER_ID",
+        "recipientPhoneNumber": "={{ $json.contacts[0]?.phone }}",
+        "textBody": "={{ $json.alert_message }}"
+      },
+      "id": "send-whatsapp",
+      "name": "Send WhatsApp Alert",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [680, 340]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://backend:8000/api/v1/admin/audit-log",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "event_type", "value": "SOS_WORKFLOW_EXECUTED" },
+            { "name": "event_id", "value": "={{ $json.event_id }}" },
+            { "name": "timestamp", "value": "={{ $json.timestamp }}" },
+            { "name": "status", "value": "notifications_sent" }
+          ]
+        }
+      },
+      "id": "store-audit-log",
+      "name": "Store Audit Log",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 480]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"success\", \"message\": \"Emergency workflow executed\", \"event_id\": \"{{ $json.event_id }}\" }"
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "SOS Webhook Trigger": {
+      "main": [[ { "node": "Create Emergency Event", "type": "main", "index": 0 } ]]
+    },
+    "Create Emergency Event": {
+      "main": [[
+        { "node": "Send Emergency Email", "type": "main", "index": 0 },
+        { "node": "Send WhatsApp Alert", "type": "main", "index": 0 },
+        { "node": "Store Audit Log", "type": "main", "index": 0 }
+      ]]
+    },
+    "Send Emergency Email": {
+      "main": [[ { "node": "Respond to Webhook", "type": "main", "index": 0 } ]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "safeher" }, { "name": "emergency" }]
+}

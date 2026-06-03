@@ -1,0 +1,44 @@
+{
+  "name": "SafeHer Daily Safety Summary",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 9 * * *" }] }
+      },
+      "id": "daily-cron",
+      "name": "Daily 9AM Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://backend:8000/api/v1/admin/analytics",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "id": "fetch-analytics",
+      "name": "Fetch Daily Analytics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const analytics = $input.first().json;\nreturn [{\n  json: {\n    subject: `SafeHer Daily Safety Report - ${new Date().toLocaleDateString()}`,\n    body: `📊 DAILY SAFETY SUMMARY\\n\\nDate: ${new Date().toLocaleDateString()}\\n\\n📈 Key Metrics:\\n• Active Users: ${analytics.active_users || 0}\\n• Journeys Today: ${analytics.daily_journeys || 0}\\n• SOS Events: ${analytics.daily_sos || 0}\\n• Incidents Reported: ${analytics.daily_incidents || 0}\\n• Avg Response Time: ${analytics.avg_response_time || 'N/A'}s\\n\\n🛡️ Platform Status: Operational\\n\\nSafeHer Platform — Keeping women safe, one journey at a time.`\n  }\n}];"
+      },
+      "id": "format-summary",
+      "name": "Format Summary Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    }
+  ],
+  "connections": {
+    "Daily 9AM Trigger": { "main": [[ { "node": "Fetch Daily Analytics", "type": "main", "index": 0 } ]] },
+    "Fetch Daily Analytics": { "main": [[ { "node": "Format Summary Email", "type": "main", "index": 0 } ]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "safeher" }, { "name": "reporting" }]
+}
