@@ -23,10 +23,10 @@ export const analyzeIncident = async (incidentData) => {
   return data
 }
 
-export const chatWithAssistant = async (messages, sessionId = null) => {
+export const chatWithAssistant = async (message, conversationHistory = []) => {
   const { data } = await client.post('/ai/chat', {
-    messages,
-    session_id: sessionId,
+    message,
+    conversation_history: conversationHistory,
   })
   return data
 }
