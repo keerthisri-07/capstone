@@ -103,7 +103,7 @@ const FakeCallModal = ({ isOpen, onClose, callerName = 'Mom 👩', callerNumber 
           >
             {/* Status bar mockup */}
             <div className="flex items-center justify-between px-6 pt-4 pb-2 text-xs text-slate-900 dark:text-white/60">
-              <span>SafeHer</span>
+              <span>SURAKSHA</span>
               {status === 'accepted' && (
                 <span className="text-green-400 font-semibold">Connected</span>
               )}

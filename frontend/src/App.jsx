@@ -22,6 +22,7 @@ const Guardians = lazy(() => import('./pages/Guardians'))
 const Analytics = lazy(() => import('./pages/Analytics'))
 const Profile = lazy(() => import('./pages/Profile'))
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
+const LiveTracking = lazy(() => import('./pages/LiveTracking'))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,7 +77,7 @@ const LoadingFallback = () => (
       <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center animate-pulse">
         <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
       </div>
-      <p className="text-gray-400 text-sm font-medium">Loading SafeHer...</p>
+      <p className="text-gray-400 text-sm font-medium">Loading SURAKSHA...</p>
     </div>
   </div>
 )
@@ -133,6 +134,17 @@ const AppRoutes = () => {
           }
         />
 
+        <Route
+          path="/track/:id"
+          element={
+            <PageWrapper>
+              <Suspense fallback={<LoadingFallback />}>
+                <LiveTracking />
+              </Suspense>
+            </PageWrapper>
+          }
+        />
+
         {/* Protected routes */}
         <Route
           path="/dashboard"
@@ -186,6 +198,16 @@ const AppRoutes = () => {
         />
         <Route
           path="/guardians"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<PageSkeleton />}>
+                <Guardians />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trust-circle"
           element={
             <ProtectedRoute>
               <Suspense fallback={<PageSkeleton />}>

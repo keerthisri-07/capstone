@@ -53,7 +53,7 @@ export const MOCK_USERS = [
   {
     id: 'u5',
     name: 'Admin User',
-    email: 'admin@safeher.ai',
+    email: 'admin@suraksha.ai',
     phone: '9876500000',
     role: 'admin',
     safetyScore: null,
@@ -414,7 +414,7 @@ export const MOCK_RECOMMENDATIONS = [
   {
     id: 'r4',
     title: 'Enable voice activation',
-    description: 'Setting up the "Help me SafeHer" voice command allows hands-free SOS activation in emergencies.',
+    description: 'Setting up the "Help me SURAKSHA" voice command allows hands-free SOS activation in emergencies.',
     priority: 'medium',
     icon: 'Mic',
     color: 'text-green-400',
@@ -453,7 +453,7 @@ export const MOCK_AI_RESPONSES = {
 - Zero FIR — file at any station regardless of jurisdiction
 - Victim identity protection in media`,
 
-  default: `I'm your SafeHer AI assistant, here to help with safety advice, legal information, and emergency guidance. 
+  default: `I'm your SURAKSHA AI assistant, here to help with safety advice, legal information, and emergency guidance. 
 
 I can help you with:
 - 🛡️ **Safety tips** for different situations

@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useLanguageStore } from '../store/languageStore'
 
-const useSpeechRecognition = () => {
+const useSpeechRecognition = (options = {}) => {
+  const { language, getLanguageObj } = useLanguageStore()
+  const activeLang = options.lang || getLanguageObj().bcp47 || 'en-IN'
+  const keywords = options.keywords || ['help', 'suraksha', 'emergency', 'bachao', 'save me', 'police']
+  const onKeywordMatch = options.onKeywordMatch
+
   const [transcript, setTranscript] = useState('')
   const [isListening, setIsListening] = useState(false)
   const [error, setError] = useState(null)
@@ -13,9 +19,9 @@ const useSpeechRecognition = () => {
     if (SpeechRecognition) {
       setIsSupported(true)
       const recognition = new SpeechRecognition()
-      recognition.continuous = true
+      recognition.continuous = options.continuous !== undefined ? options.continuous : true
       recognition.interimResults = true
-      recognition.lang = 'en-IN'
+      recognition.lang = activeLang
 
       recognition.onstart = () => {
         setIsListening(true)
@@ -33,16 +39,37 @@ const useSpeechRecognition = () => {
             interimTranscript += t
           }
         }
-        setTranscript((prev) => prev + finalTranscript || interimTranscript)
+        const currentText = (finalTranscript || interimTranscript).toLowerCase()
+        setTranscript((prev) => (finalTranscript ? prev + finalTranscript : prev))
+
+        if (onKeywordMatch && currentText) {
+          for (const kw of keywords) {
+            if (currentText.includes(kw.toLowerCase())) {
+              onKeywordMatch(kw, currentText)
+              break
+            }
+          }
+        }
       }
 
       recognition.onerror = (event) => {
         setError(event.error || 'Speech recognition error')
-        setIsListening(false)
+        if (event.error !== 'no-speech') {
+          setIsListening(false)
+        }
       }
 
       recognition.onend = () => {
-        setIsListening(false)
+        // If continuous voice SOS is desired and still flagged, auto-restart
+        if (options.autoRestart && isListening) {
+          try {
+            recognition.start()
+          } catch {
+            setIsListening(false)
+          }
+        } else {
+          setIsListening(false)
+        }
       }
 
       recognitionRef.current = recognition
@@ -52,10 +79,14 @@ const useSpeechRecognition = () => {
 
     return () => {
       if (recognitionRef.current) {
-        recognitionRef.current.abort()
+        try {
+          recognitionRef.current.abort()
+        } catch {
+          // ignore
+        }
       }
     }
-  }, [])
+  }, [activeLang, options.autoRestart, options.continuous])
 
   const startListening = useCallback(() => {
     if (!recognitionRef.current) return
@@ -63,19 +94,41 @@ const useSpeechRecognition = () => {
     setError(null)
     try {
       recognitionRef.current.start()
-    } catch (err) {
+      setIsListening(true)
+    } catch {
       setError('Could not start speech recognition.')
     }
   }, [])
 
   const stopListening = useCallback(() => {
     if (!recognitionRef.current) return
-    recognitionRef.current.stop()
+    try {
+      recognitionRef.current.stop()
+    } catch {
+      // ignore
+    }
     setIsListening(false)
   }, [])
 
   const resetTranscript = useCallback(() => {
     setTranscript('')
+  }, [])
+
+  // Text-to-Speech Helper
+  const speak = useCallback((text, langCode) => {
+    if (!('speechSynthesis' in window)) return
+    window.speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = langCode || activeLang
+    utterance.rate = 1.0
+    utterance.pitch = 1.0
+    window.speechSynthesis.speak(utterance)
+  }, [activeLang])
+
+  const stopSpeaking = useCallback(() => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel()
+    }
   }, [])
 
   return {
@@ -86,6 +139,8 @@ const useSpeechRecognition = () => {
     startListening,
     stopListening,
     resetTranscript,
+    speak,
+    stopSpeaking,
   }
 }
 

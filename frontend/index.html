@@ -4,10 +4,10 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="SafeHer — AI-Powered Women Safety Platform. Intelligent journey monitoring, distress detection, and emergency response." />
+    <meta name="description" content="SURAKSHA — Safe Companion. Intelligent journey monitoring, distress detection, and emergency response." />
     <meta name="keywords" content="women safety, AI safety, emergency response, guardian network, journey monitoring" />
     <meta name="theme-color" content="#5B21B6" />
-    <meta property="og:title" content="SafeHer — AI Safety Companion" />
+    <meta property="og:title" content="SURAKSHA — AI Safety Companion" />
     <meta property="og:description" content="Your intelligent AI-powered safety companion that proactively monitors journeys and detects distress." />
     <meta property="og:type" content="website" />
     <!-- Google Fonts preconnect -->
@@ -16,7 +16,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <title>SafeHer — AI Women Safety Companion</title>
+    <!-- SPA redirect decode script for GitHub Pages -->
+    <script type="text/javascript">
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&') 
+          }).join('?');
+          window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
+    <title>SURAKSHA — AI Women Safety Companion</title>
   </head>
   <body>
     <div id="root"></div>

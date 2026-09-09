@@ -277,3 +277,73 @@ async def delete_sos_event(
         )
 
     await sos.delete()
+
+
+# ── POST /sos/voice-trigger ───────────────────────────────────────────────────
+
+@router.post("/voice-trigger")
+async def trigger_voice_sos(
+    payload: dict,
+    background_tasks: BackgroundTasks,
+    current_user: User = Depends(get_current_active_user),
+):
+    """
+    Voice-activated SOS endpoint. Triggered when custom voice keyword (e.g., 'Help me SURAKSHA')
+    is detected through browser/app speech recognition.
+    """
+    keyword = payload.get("keyword", "Help me SURAKSHA")
+    lat = payload.get("latitude", 12.9716)
+    lng = payload.get("longitude", 77.5946)
+
+    location_data = {
+        "lat": lat,
+        "lng": lng,
+        "address": payload.get("address", "Live GPS Coordinates"),
+    }
+
+    event_id = f"SOS-VOICE-{int(datetime.now(timezone.utc).timestamp())}"
+
+    # Non-blocking trigger to n8n emergency workflow
+    background_tasks.add_task(
+        trigger_sos_workflow,
+        sos_id=event_id,
+        user_name=current_user.full_name or "SURAKSHA User",
+        user_phone=current_user.phone or "N/A",
+        location=location_data,
+        message=f"Voice SOS activated by keyword '{keyword}'",
+        contacts=current_user.emergency_contacts or [],
+    )
+
+    return {
+        "status": "triggered",
+        "event_id": event_id,
+        "trigger_type": "voice_sos",
+        "keyword": keyword,
+        "location": location_data,
+        "message": f"Voice SOS initiated for keyword '{keyword}'. Trust Circle & n8n notified.",
+    }
+
+
+# ── GET /sos/offline-payload ──────────────────────────────────────────────────
+
+@router.get("/offline-payload")
+async def get_offline_sms_payload(
+    lat: float = Query(12.9716),
+    lng: float = Query(77.5946),
+):
+    """
+    Generates standard offline SMS message payload for offline emergency dispatch.
+    """
+    body = (
+        f"🚨 EMERGENCY ALERT FROM SURAKSHA!\n"
+        f"I need urgent assistance!\n"
+        f"Location: https://maps.google.com/?q={lat},{lng}\n"
+        f"Coordinates: {lat}, {lng}"
+    )
+    return {
+        "sms_uri": f"sms:?body={body}",
+        "message_body": body,
+        "emergency_number": "112",
+        "women_helpline": "1091",
+    }
+

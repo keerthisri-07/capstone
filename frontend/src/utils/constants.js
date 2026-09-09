@@ -43,7 +43,7 @@ export const HELPLINES = [
 ]
 
 export const DEMO_CREDENTIALS = {
-  admin: { email: 'admin@safeher.ai', password: 'demo123', role: 'admin' },
+  admin: { email: 'admin@suraksha.ai', password: 'demo123', role: 'admin' },
   user: { email: 'priya@example.com', password: 'demo123', role: 'user' },
   guardian: { email: 'guardian@example.com', password: 'demo123', role: 'guardian' },
 }

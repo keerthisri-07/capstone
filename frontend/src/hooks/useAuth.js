@@ -16,7 +16,8 @@ const useAuth = () => {
     } catch (error) {
       // Mock login for demo
       const DEMO = {
-        'admin@safeher.ai': { id: 'u5', name: 'Admin User', email: 'admin@safeher.ai', role: 'admin', safetyScore: null },
+        'admin@suraksha.ai': { id: 'u5', name: 'Admin User', email: 'admin@suraksha.ai', role: 'admin', safetyScore: null },
+        'admin@safeher.ai': { id: 'u5', name: 'Admin User', email: 'admin@suraksha.ai', role: 'admin', safetyScore: null },
         'priya@example.com': { id: 'u1', name: 'Priya Sharma', email: 'priya@example.com', role: 'user', safetyScore: 87 },
         'guardian@example.com': { id: 'u4', name: 'Rahul Gupta', email: 'guardian@example.com', role: 'guardian', safetyScore: null },
       }

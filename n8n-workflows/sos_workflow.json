@@ -1,10 +1,10 @@
 {
-  "name": "SafeHer SOS Emergency Workflow",
+  "name": "SURAKSHA SOS Emergency Workflow",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "safeher-sos",
+        "path": "suraksha-sos",
         "responseMode": "responseNode",
         "options": {}
       },
@@ -16,7 +16,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const data = $input.first().json;\nconst now = new Date().toISOString();\nreturn [{\n  json: {\n    event_id: data.sos_id || 'SOS-' + Date.now(),\n    user_name: data.user_name || 'SafeHer User',\n    user_phone: data.user_phone || 'N/A',\n    location: data.location || { lat: 0, lng: 0, address: 'Unknown' },\n    message: data.message || 'Emergency SOS Activated',\n    timestamp: now,\n    emergency_type: data.emergency_type || 'SOS',\n    contacts: data.notified_contacts || [],\n    alert_message: `🚨 EMERGENCY ALERT\\n\\nUser: ${data.user_name}\\nTime: ${now}\\nLocation: ${data.location?.address || 'See coordinates'}\\nCoords: ${data.location?.lat}, ${data.location?.lng}\\n\\nThis is an automated SOS alert from SafeHer Platform.\\nPlease respond immediately.`\n  }\n}];"
+        "jsCode": "const data = $input.first().json;\nconst now = new Date().toISOString();\nreturn [{\n  json: {\n    event_id: data.sos_id || 'SOS-' + Date.now(),\n    user_name: data.user_name || 'SURAKSHA User',\n    user_phone: data.user_phone || 'N/A',\n    location: data.location || { lat: 0, lng: 0, address: 'Unknown' },\n    message: data.message || 'Emergency SOS Activated',\n    timestamp: now,\n    emergency_type: data.emergency_type || 'SOS',\n    contacts: data.notified_contacts || [],\n    alert_message: `🚨 EMERGENCY ALERT\\n\\nUser: ${data.user_name}\\nTime: ${now}\\nLocation: ${data.location?.address || 'See coordinates'}\\nCoords: ${data.location?.lat}, ${data.location?.lng}\\n\\nThis is an automated SOS alert from SURAKSHA Platform.\\nPlease respond immediately.`\n  }\n}];"
       },
       "id": "create-emergency-event",
       "name": "Create Emergency Event",
@@ -26,7 +26,7 @@
     },
     {
       "parameters": {
-        "fromEmail": "alerts@safeher.ai",
+        "fromEmail": "alerts@suraksha.ai",
         "toEmail": "={{ $json.contacts.map(c => c.email).join(',') }}",
         "subject": "🚨 EMERGENCY: {{ $json.user_name }} needs help!",
         "text": "={{ $json.alert_message }}",
@@ -100,5 +100,5 @@
     }
   },
   "settings": { "executionOrder": "v1" },
-  "tags": [{ "name": "safeher" }, { "name": "emergency" }]
+  "tags": [{ "name": "suraksha" }, { "name": "emergency" }]
 }

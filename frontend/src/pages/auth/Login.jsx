@@ -122,7 +122,7 @@ const Login = () => {
 
   const fillDemo = (type) => {
     const creds = {
-      admin: { email: 'admin@safeher.ai', password: 'demo123' },
+      admin: { email: 'admin@suraksha.ai', password: 'demo123' },
       user: { email: 'priya@example.com', password: 'demo123' },
     }
     setForm(creds[type])
@@ -168,7 +168,7 @@ const Login = () => {
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-xl shadow-purple-500/30">
               <Shield className="w-6 h-6 text-slate-900 dark:text-white" />
             </div>
-            <span className="text-2xl font-black text-slate-900 dark:text-white">SafeHer</span>
+            <span className="text-2xl font-black text-slate-900 dark:text-white">SURAKSHA</span>
           </Link>
         </div>
 
@@ -242,7 +242,7 @@ const Login = () => {
 
         {/* Footer */}
         <div className="relative z-10 text-xs text-gray-600">
-          © 2026 SafeHer. All rights reserved.
+          © 2026 SURAKSHA. All rights reserved.
         </div>
       </motion.div>
 
@@ -259,7 +259,7 @@ const Login = () => {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center">
               <Shield className="w-5 h-5 text-slate-900 dark:text-white" />
             </div>
-            <span className="text-xl font-black gradient-text">SafeHer</span>
+            <span className="text-xl font-black gradient-text">SURAKSHA</span>
           </div>
 
           <motion.div
@@ -269,7 +269,7 @@ const Login = () => {
           >
             <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-1">Welcome back</h2>
             <p className="text-gray-400 text-sm mb-8">
-              Sign in to your SafeHer account
+              Sign in to your SURAKSHA account
             </p>
 
             {/* Demo credentials card */}
@@ -292,7 +292,7 @@ const Login = () => {
                   className="text-left bg-white/5 hover:bg-white/10 rounded-xl px-3 py-2.5 transition-all group"
                 >
                   <p className="text-xs font-semibold text-gray-300 group-hover:text-slate-900 dark:text-white">Admin Demo</p>
-                  <p className="text-[10px] text-gray-500 mt-0.5">admin@safeher.ai</p>
+                  <p className="text-[10px] text-gray-500 mt-0.5">admin@suraksha.ai</p>
                   <p className="text-[10px] text-gray-500">demo123</p>
                 </button>
               </div>

@@ -15,7 +15,7 @@ const NAV_ITEMS = [
   { path: '/sos', label: 'SOS Center', icon: AlertOctagon, highlight: true },
   { path: '/assistant', label: 'AI Assistant', icon: Bot },
   { path: '/incidents', label: 'Incidents', icon: FileWarning },
-  { path: '/guardians', label: 'Guardians', icon: Users },
+  { path: '/guardians', label: 'Trust Circle', icon: Users },
   { path: '/analytics', label: 'Analytics', icon: BarChart3 },
   { path: '/profile', label: 'Profile', icon: UserCircle },
 ]
@@ -32,7 +32,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center">
             <Shield className="w-[18px] h-[18px] text-slate-900 dark:text-white" />
           </div>
-          <span className="font-black text-lg gradient-text">SafeHer</span>
+          <span className="font-black text-lg gradient-text">SURAKSHA</span>
         </div>
       </div>
 

@@ -4,35 +4,35 @@ services:
   # ─── MongoDB ─────────────────────────────────────────
   mongodb:
     image: mongo:7.0
-    container_name: safeher_mongodb
+    container_name: suraksha_mongodb
     restart: unless-stopped
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_DATABASE: safeher_db
+      MONGO_INITDB_DATABASE: suraksha_db
     volumes:
       - mongo_data:/data/db
     networks:
-      - safeher_net
+      - suraksha_net
 
   # ─── ChromaDB ────────────────────────────────────────
   chromadb:
     image: chromadb/chroma:latest
-    container_name: safeher_chromadb
+    container_name: suraksha_chromadb
     restart: unless-stopped
     ports:
       - "8001:8000"
     volumes:
       - chroma_data:/chroma/chroma
     networks:
-      - safeher_net
+      - suraksha_net
 
   # ─── Backend (FastAPI) ───────────────────────────────
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: safeher_backend
+    container_name: suraksha_backend
     restart: unless-stopped
     ports:
       - "8000:8000"
@@ -49,37 +49,37 @@ services:
     volumes:
       - ./backend:/app
     networks:
-      - safeher_net
+      - suraksha_net
 
   # ─── Frontend (Nginx) ────────────────────────────────
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: safeher_frontend
+    container_name: suraksha_frontend
     restart: unless-stopped
     ports:
       - "80:80"
     depends_on:
       - backend
     networks:
-      - safeher_net
+      - suraksha_net
 
   # ─── n8n Automation ──────────────────────────────────
   n8n:
     image: n8nio/n8n:latest
-    container_name: safeher_n8n
+    container_name: suraksha_n8n
     restart: unless-stopped
     ports:
       - "5678:5678"
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=admin
-      - N8N_BASIC_AUTH_PASSWORD=safeher2024
+      - N8N_BASIC_AUTH_PASSWORD=suraksha2024
     volumes:
       - n8n_data:/home/node/.n8n
     networks:
-      - safeher_net
+      - suraksha_net
 
 volumes:
   mongo_data:
@@ -87,5 +87,5 @@ volumes:
   n8n_data:
 
 networks:
-  safeher_net:
+  suraksha_net:
     driver: bridge

@@ -3,19 +3,25 @@ import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Shield, Bell, ChevronDown, User, Settings, LogOut,
-  Menu, X, Search
+  Menu, X, Search, Globe
 } from 'lucide-react'
 import ThemeToggle from '../ui/ThemeToggle'
 import useAuth from '../../hooks/useAuth'
 import { MOCK_NOTIFICATIONS } from '../../utils/mockData'
+import { useLanguageStore, SUPPORTED_LANGUAGES } from '../../store/languageStore'
 
 const Navbar = ({ onMenuToggle, isMobileOpen }) => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [showLangMenu, setShowLangMenu] = useState(false)
   const userMenuRef = useRef(null)
   const notifRef = useRef(null)
+  const langMenuRef = useRef(null)
+
+  const { language, setLanguage, getLanguageObj } = useLanguageStore()
+  const currentLang = getLanguageObj()
 
   const unreadCount = MOCK_NOTIFICATIONS.filter((n) => !n.read).length
 
@@ -23,6 +29,7 @@ const Navbar = ({ onMenuToggle, isMobileOpen }) => {
     const handleClick = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setShowUserMenu(false)
       if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifications(false)
+      if (langMenuRef.current && !langMenuRef.current.contains(e.target)) setShowLangMenu(false)
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
@@ -57,12 +64,58 @@ const Navbar = ({ onMenuToggle, isMobileOpen }) => {
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
               <Shield className="w-4.5 h-4.5 text-slate-900 dark:text-white w-[18px] h-[18px]" />
             </div>
-            <span className="font-black text-lg gradient-text hidden sm:block">SafeHer</span>
+            <span className="font-black text-lg gradient-text hidden sm:block">SURAKSHA</span>
           </Link>
         </div>
 
         {/* Right: actions */}
         <div className="flex items-center gap-2">
+          {/* Language Selector */}
+          <div className="relative" ref={langMenuRef}>
+            <button
+              onClick={() => setShowLangMenu((v) => !v)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+              title="Change Language"
+            >
+              <Globe className="w-3.5 h-3.5 text-violet-400" />
+              <span>{currentLang.native}</span>
+              <ChevronDown className="w-3 h-3 text-gray-400" />
+            </button>
+
+            <AnimatePresence>
+              {showLangMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 top-full mt-2 w-44 bg-[#1A1A2E] border border-purple-900/30 rounded-2xl shadow-2xl overflow-hidden py-1 z-50"
+                >
+                  <div className="px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-800">
+                    Select Language
+                  </div>
+                  {SUPPORTED_LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        setLanguage(lang.code)
+                        setShowLangMenu(false)
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-2 text-xs text-left transition-colors ${
+                        language === lang.code
+                          ? 'bg-violet-600/30 text-violet-300 font-bold'
+                          : 'text-gray-300 hover:bg-white/5'
+                      }`}
+                    >
+                      <span>{lang.native}</span>
+                      <span className="text-[10px] text-gray-500">{lang.name}</span>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           <ThemeToggle />
 
           {/* Notifications */}

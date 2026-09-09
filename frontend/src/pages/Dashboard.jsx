@@ -131,7 +131,7 @@ const Dashboard = () => {
               transition={{ delay: 0.4 }}
               className="text-gray-400 text-sm mb-5 max-w-sm"
             >
-              Your SafeHer dashboard is active and monitoring. Stay aware, stay safe. 💜
+              Your SURAKSHA dashboard is active and monitoring. Stay aware, stay safe. 💜
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 16 }}

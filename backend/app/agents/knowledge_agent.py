@@ -44,7 +44,7 @@ SAFETY_DOCUMENTS = [
     {"id": "travel_01", "text": "Cab Safety: Before entering a taxi or ride-share, verify the license plate, driver's name, and photo. Always share your live trip status with a trusted guardian.", "category": "Travel Safety"},
     {"id": "travel_02", "text": "Sitting Arrangement in Cabs: Always sit in the back seat of a taxi. This keeps you out of immediate reach and allows for an easier exit from either door if necessary.", "category": "Travel Safety"},
     {"id": "travel_03", "text": "Public Transport Awareness: While on a bus or train, avoid empty compartments. Sit near other women, families, or the conductor/driver.", "category": "Travel Safety"},
-    {"id": "travel_04", "text": "Fake Phone Call Tactic: If you feel uncomfortable during a ride, make a fake phone call (or use SafeHer's Fake Call feature) and loudly state your location, ETA, and cab number.", "category": "Travel Safety"},
+    {"id": "travel_04", "text": "Fake Phone Call Tactic: If you feel uncomfortable during a ride, make a fake phone call (or use SURAKSHA's Fake Call feature) and loudly state your location, ETA, and cab number.", "category": "Travel Safety"},
     {"id": "travel_05", "text": "Child Lock Check: As soon as you enter a cab, check if the child lock on your door is engaged. Roll down the window slightly if you feel suspicious.", "category": "Travel Safety"},
     {"id": "travel_06", "text": "Walking at Night: Stick to well-lit, populated streets. Walk confidently, keep your head up, and avoid looking at your phone to maintain situational awareness.", "category": "Travel Safety"},
     {"id": "travel_07", "text": "Car Keys as Weapons: Do not lace keys between your fingers as it can break your hand. Hold a single key firmly pointing outward like a small knife for defense.", "category": "Travel Safety"},
@@ -189,25 +189,31 @@ async def chat_with_knowledge_base(input_data: dict) -> dict:
         related_topics = ["Emergency Helplines", "Immediate Self Defense", "Legal Rights Overview"]
         suggested_actions = ["Save speed-dial shortcuts", "Review Indian Penal Code rights", "Download safety checklist"]
 
+    language = input_data.get("language", "en")
+    lang_names = {
+        "en": "English",
+        "hi": "Hindi",
+        "ta": "Tamil",
+        "te": "Telugu",
+        "kn": "Kannada",
+        "bn": "Bengali",
+        "mr": "Marathi",
+    }
+    target_lang_name = lang_names.get(language, "English")
+
     # 1. Try Gemini API
     if api_key and api_key != "your-gemini-api-key-here":
         try:
-            prompt = f"""You are 'Chitti', a supportive and professional AI safety assistant for SafeHer.
-Answer the user's safety query based on the retrieved safety knowledge facts. 
+            prompt = f"""You are 'Chitti', a supportive and professional AI safety assistant for SURAKSHA.
+Answer the user's safety query based on the retrieved safety knowledge facts in the {target_lang_name} language.
 If the retrieved facts do not directly answer, provide general safety advice focusing on practical, actionable tips.
-Keep the answer helpful, empathetic, and formatted using clean Markdown.
+Respond in fluent {target_lang_name}. Keep the answer helpful, empathetic, and formatted using clean Markdown.
 
 Retrieved Safety Knowledge:
 {context_str}
 
 User's Question: {message}
 """
-            url = f"https://generativelimits.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
-            # Fallback to standard endpoint
-            if "generativelimits" not in url:
-                url = f"https://generativetooling.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
-            
-            # Use standard API endpoint url
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
             
             headers = {"Content-Type": "application/json"}
@@ -232,11 +238,11 @@ User's Question: {message}
                 "Authorization": f"Bearer {openai_key}",
                 "Content-Type": "application/json"
             }
-            prompt = f"Retrieved Safety Knowledge:\n{context_str}\n\nUser Question: {message}"
+            prompt = f"Retrieved Safety Knowledge:\n{context_str}\n\nUser Question: {message}\n\nPlease respond in {target_lang_name} language."
             payload = {
                 "model": "gpt-4o-mini",
                 "messages": [
-                    {"role": "system", "content": "You are 'Chitti', an empathetic and professional women's safety AI assistant for SafeHer. Answer based on safety knowledge context."},
+                    {"role": "system", "content": f"You are 'Chitti', an empathetic and professional women's safety AI assistant for SURAKSHA. Respond in {target_lang_name}."},
                     {"role": "user", "content": prompt}
                 ]
             }
@@ -248,15 +254,18 @@ User's Question: {message}
         except Exception:
             response_text = ""
 
-    # 3. Fallback to Local/Mock response generator
+    # 3. Fallback to Local/Mock response generator (Multilingual)
     if not response_text:
-        # Match query with some custom rules
-        matched_text = "Here is what I found in our safety knowledge base:\n\n"
-        for s in sources:
-            matched_text += f"- **{s['category']}**: {s['text']}\n"
-            
-        matched_text += "\nAlways trust your intuition. In any emergency, your immediate safety is the top priority."
-        response_text = matched_text
+        fallback_templates = {
+            "hi": "सुरक्षा ज्ञानकोष से मुख्य जानकारी:\n\n- **आपातकालीन नंबर**: 112 (राष्ट्रीय आपातकाल), 181 / 1091 (महिला हेल्पलाइन).\n- **ज़ीरो एफआईआर**: किसी भी पुलिस स्टेशन में तुरंत एफआईआर दर्ज करवा सकते हैं।\n- **कैब सुरक्षा**: यात्रा शुरू करने से पहले लाइव ट्रैकिंग लिंक ट्रस्ट सर्कल के साथ साझा करें।\n\nहमेशा अपनी सूझबूझ पर भरोसा रखें। किसी भी आपात स्थिति में अपनी सुरक्षा को सर्वोच्च प्राथमिकता दें।",
+            "ta": "சுரக்ஷா பாதுகாப்பு தகவல் தளத்திலிருந்து முக்கிய குறிப்புகள்:\n\n- **அவசர உதவி எண்கள்**: 112 (தேசிய அவசர உதவி), 181 / 1091 (பெண்கள் உதவி மையம்).\n- **ஜீரோ எஃப்.ஐ.ஆர்**: எந்த காவல் நிலையத்திலும் உடனடியாக எஃப்.ஐ.ஆர் பதிவு செய்யலாம்.\n- **பயண பாதுகாப்பு**: பயணத்தை தொடங்கும் முன் நேரலை இருப்பிடத்தைப் பகிரவும்.\n\nஎப்போதும் எச்சரிக்கையாக இருங்கள். எந்தவொரு அவசரநிலையிலும் உங்கள் பாதுகாப்பே முதன்மையானது.",
+            "te": "సురక్ష భద్రతా సమాచార నిధి నుండి ముఖ్యమైన సమాచారం:\n\n- **అత్యవసర నంబర్లు**: 112 (జాతీయ అత్యవసర సహాయం), 181 / 1091 (మహిళా హెల్ప్‌లైన్).\n- **జీరో ఎఫ్‌ఐఆర్**: ఏ పోలీస్ స్టేషన్‌లోనైనా తక్షణమే ఎఫ్‌ఐఆర్ నమోదు చేసుకోవచ్చు.\n- **ప్రయాణ భద్రత**: ప్రయాణం ప్రారంభించే ముందు లైవ్ ట్రాకింగ్ లింక్‌ను పంచుకోండి.\n\nఎల్లప్పుడూ మీ అంతర్ దృష్టిని నమ్మండి. అత్యవసర పరిస్థితుల్లో మీ భద్రతే మొదటి ప్రాధాన్యత.",
+            "kn": "ಸುರಕ್ಷಾ ಜ್ಞಾನಕೋಶದಿಂದ ಪ್ರಮುಖ ಸುರಕ್ಷತಾ ಮಾಹಿತಿ:\n\n- **ತುರ್ತು ಸಂಖ್ಯೆಗಳು**: 112 (ರಾಷ್ಟ್ರೀಯ ತುರ್ತು ಸಹಾಯ), 181 / 1091 (ಮಹಿಳಾ ಸಹಾಯವಾಣಿ).\n- **ಜೀರೋ ಎಫ್‌ಐಆರ್**: ಯಾವುದೇ ಪೊಲೀಸ್ ಠಾಣೆಯಲ್ಲಿ ತಕ್ಷಣ ಎಫ್‌ಐಆರ್ ದಾಖಲಿಸಬಹುದು.\n- **ಪ್ರಯಾಣ ಸುರಕ್ಷತೆ**: ಪ್ರಯಾಣ ಪ್ರಾರಂಭಿಸುವ ಮುನ್ನ ಲೈವ್ ಟ್ರ್ಯಾಕಿಂಗ್ ಹಂಚಿಕೊಳ್ಳಿ.\n\nಯಾವಾಗಲೂ ಜಾಗರೂಕರಾಗಿರಿ. ತುರ್ತು ಪರಿಸ್ಥಿತಿಯಲ್ಲಿ ನಿಮ್ಮ ಸುರಕ್ಷತೆಯೇ ಮೊದಲ ಆದ್ಯತೆ.",
+            "bn": "সুরক্ষা নির্দেশিকা থেকে গুরুত্বপূর্ণ নিরাপত্তা তথ্য:\n\n- **জরুরি নম্বর**: 112 (জাতীয় জরুরি সাহায্য), 181 / 1091 (মহিলা হেল্পলাইন).\n- **জিরো এফআইআর**: যেকোনো থানায় অবিলম্বে এফআইআর দায়ের করার অধিকার রয়েছে।\n- **ভ্রমণ নিরাপত্তা**: যাত্রা শুরু করার আগে ট্রাস্ট সার্কেলের সাথে লাইভ ট্র্যাকিং শেয়ার করুন।\n\nসর্বদা সতর্ক থাকুন। যেকোনো জরুরি পরিস্থিতিতে আপনার সুরক্ষাই সর্বাধিক অগ্রাধিকার।",
+            "mr": "सुरक्षा माहिती केंद्राकडून महत्त्वाच्या सुरक्षा सूचना:\n\n- **आपत्कालीन क्रमांक**: 112 (राष्ट्रीय आपत्कालीन सेवा), 181 / 1091 (महिला हेल्पलाइन).\n- **झिरो एफआयआर**: कोणत्याही पोलीस ठाण्यात तत्काळ तक्रार (FIR) नोंदवू शकता.\n- **प्रवास सुरक्षा**: प्रवास सुरू करण्यापूर्वी लाईव्ह ट्रॅकिंग लिंक शेअर करा.\n\nनेहमी आपल्या अंतःप्रेरणेवर विश्वास ठेवा. आपत्कालीन स्थितीत आपली सुरक्षा हीच सर्वोच्च प्राथमिकता आहे.",
+            "en": "Here is what I found in our safety knowledge base:\n\n" + "\n".join([f"- **{s['category']}**: {s['text']}" for s in sources]) + "\n\nAlways trust your intuition. In any emergency, your immediate safety is the top priority."
+        }
+        response_text = fallback_templates.get(language, fallback_templates["en"])
 
     return {
         "response": response_text,

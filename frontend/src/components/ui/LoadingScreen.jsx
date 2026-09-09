@@ -43,7 +43,7 @@ export default function LoadingScreen() {
           className="text-center"
         >
           <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">
-            SafeHer
+            SURAKSHA
           </h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium">AI Safety Platform</p>
         </motion.div>

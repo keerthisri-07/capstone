@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api import auth, users, journeys, sos, incidents, guardians, analytics, ai, admin
 
 app = FastAPI(
-    title="SafeHer API",
+    title="SURAKSHA API",
     description="Backend API for AI Women Safety Companion",
     version="1.0.0"
 )
@@ -29,5 +29,5 @@ app.include_router(admin.router, prefix="/api/v1")
 
 @app.get("/api/health", tags=["health"])
 async def health_check():
-    return {"status": "healthy", "service": "SafeHer API"}
+    return {"status": "healthy", "service": "SURAKSHA API"}
 

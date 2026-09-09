@@ -1,5 +1,5 @@
 {
-  "name": "SafeHer Daily Safety Summary",
+  "name": "SURAKSHA Daily Safety Summary",
   "nodes": [
     {
       "parameters": {
@@ -26,7 +26,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const analytics = $input.first().json;\nreturn [{\n  json: {\n    subject: `SafeHer Daily Safety Report - ${new Date().toLocaleDateString()}`,\n    body: `📊 DAILY SAFETY SUMMARY\\n\\nDate: ${new Date().toLocaleDateString()}\\n\\n📈 Key Metrics:\\n• Active Users: ${analytics.active_users || 0}\\n• Journeys Today: ${analytics.daily_journeys || 0}\\n• SOS Events: ${analytics.daily_sos || 0}\\n• Incidents Reported: ${analytics.daily_incidents || 0}\\n• Avg Response Time: ${analytics.avg_response_time || 'N/A'}s\\n\\n🛡️ Platform Status: Operational\\n\\nSafeHer Platform — Keeping women safe, one journey at a time.`\n  }\n}];"
+        "jsCode": "const analytics = $input.first().json;\nreturn [{\n  json: {\n    subject: `SURAKSHA Daily Safety Report - ${new Date().toLocaleDateString()}`,\n    body: `📊 DAILY SAFETY SUMMARY\\n\\nDate: ${new Date().toLocaleDateString()}\\n\\n📈 Key Metrics:\\n• Active Users: ${analytics.active_users || 0}\\n• Journeys Today: ${analytics.daily_journeys || 0}\\n• SOS Events: ${analytics.daily_sos || 0}\\n• Incidents Reported: ${analytics.daily_incidents || 0}\\n• Avg Response Time: ${analytics.avg_response_time || 'N/A'}s\\n\\n🛡️ Platform Status: Operational\\n\\nSURAKSHA Platform — Keeping women safe, one journey at a time.`\n  }\n}];"
       },
       "id": "format-summary",
       "name": "Format Summary Email",
@@ -40,5 +40,5 @@
     "Fetch Daily Analytics": { "main": [[ { "node": "Format Summary Email", "type": "main", "index": 0 } ]] }
   },
   "settings": { "executionOrder": "v1" },
-  "tags": [{ "name": "safeher" }, { "name": "reporting" }]
+  "tags": [{ "name": "suraksha" }, { "name": "reporting" }]
 }

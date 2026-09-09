@@ -1,8 +1,8 @@
-# 🛡️ SafeHer — AI Women Safety Companion Platform
+# 🛡️ SURAKSHA — AI Women Safety Companion Platform
 
 <div align="center">
 
-![SafeHer Banner](https://img.shields.io/badge/SafeHer-AI%20Safety%20Platform-6d28d9?style=for-the-badge&logo=shield&logoColor=white)
+![SURAKSHA Banner](https://img.shields.io/badge/SURAKSHA-AI%20Safety%20Platform-6d28d9?style=for-the-badge&logo=shield&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.104-009688?style=flat-square&logo=fastapi)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)
@@ -38,7 +38,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    SAFEHER PLATFORM                         │
+│                    SURAKSHA PLATFORM                        │
 ├─────────────────┬───────────────────────────────────────────┤
 │   FRONTEND      │              BACKEND                       │
 │   React 18      │         FastAPI + Python 3.11             │
@@ -135,9 +135,9 @@ Frontend runs at: http://localhost:5173
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@safeher.ai | demo123 |
-| User | user@safeher.ai | demo123 |
-| Guardian | guardian@safeher.ai | demo123 |
+| Admin | admin@suraksha.ai | demo123 |
+| User | user@suraksha.ai | demo123 |
+| Guardian | guardian@suraksha.ai | demo123 |
 
 ---
 
@@ -233,7 +233,7 @@ AI_PROVIDER=openai
 ### LangSmith (Monitoring)
 ```env
 LANGSMITH_API_KEY=your-key-here
-LANGSMITH_PROJECT=safeher-platform
+LANGSMITH_PROJECT=suraksha-platform
 LANGCHAIN_TRACING_V2=true
 ```
 
@@ -347,5 +347,5 @@ This project is built as a capstone project demonstrating production-grade AI ap
 ---
 
 <div align="center">
-Built with ❤️ for women's safety | SafeHer Platform 2024
+Built with ❤️ for women's safety | SURAKSHA Platform 2024
 </div>
