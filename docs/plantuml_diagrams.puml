@@ -1,0 +1,391 @@
+@startuml suraksha_use_case
+!theme plain
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam roundcorner 8
+skinparam shadowing false
+skinparam defaultFontName "Arial"
+skinparam ArrowColor #4C1D95
+skinparam ActorBorderColor #6D28D9
+skinparam ActorBackgroundColor #EDE9FE
+skinparam UseCaseBorderColor #7C3AED
+skinparam UseCaseBackgroundColor #FAF5FF
+
+title **SURAKSHA - Use Case Diagram**
+
+left to right direction
+
+actor "👩 Woman / Commuter\n(User)" as User
+actor "👥 Guardian\n(Contact)" as Guardian
+actor "👨‍💼 Platform\nAdministrator" as Admin
+actor "🤖 LangGraph AI\nEngine" as AI <<System>>
+actor "🔄 n8n Automation\nService" as N8N <<External>>
+
+rectangle "SURAKSHA Platform" {
+    package "Authentication & Profile" {
+        usecase "UC-01: Register & Login (JWT/OTP)" as UC_Auth
+        usecase "UC-02: Manage Guardians & Contacts" as UC_Guardians
+    }
+
+    package "Emergency & SOS Subsystem" {
+        usecase "UC-03: Trigger Emergency SOS" as UC_SOS
+        usecase "UC-04: Capture Live GPS Coordinates" as UC_GPS
+        usecase "UC-05: Dispatch Multi-Channel Alerts" as UC_Alert
+        usecase "UC-06: Resolve / De-escalate SOS" as UC_Resolve
+        usecase "UC-07: Simulate Fake Emergency Call" as UC_FakeCall
+    }
+
+    package "Journey Monitoring" {
+        usecase "UC-08: Start Monitored Journey" as UC_StartJourney
+        usecase "UC-09: Detect Deviations & Stoppages" as UC_DetectAnomaly
+    }
+
+    package "Intelligence & Assistance" {
+        usecase "UC-10: Analyze Text/Speech Distress" as UC_Distress
+        usecase "UC-11: Report Incident / Harassment" as UC_ReportIncident
+        usecase "UC-12: Auto-Generate Incident Timeline" as UC_GenTimeline
+        usecase "UC-13: Export Incident Dossier (PDF/DOCX)" as UC_ExportDossier
+        usecase "UC-14: Query RAG Legal & Safety Assistant" as UC_Chatbot
+        usecase "UC-15: View Safety Score & Heatmap" as UC_Analytics
+    }
+
+    package "Administration" {
+        usecase "UC-16: Audit Platform Telemetry & Users" as UC_AdminAudit
+        usecase "UC-17: Seed Simulation & Demo Data" as UC_SeedData
+    }
+}
+
+' User Associations
+User --> UC_Auth
+User --> UC_Guardians
+User --> UC_SOS
+User --> UC_FakeCall
+User --> UC_StartJourney
+User --> UC_Distress
+User --> UC_ReportIncident
+User --> UC_Chatbot
+User --> UC_Analytics
+
+' Guardian Associations
+Guardian --> UC_Auth
+Guardian --> UC_Resolve
+Guardian <-- UC_Alert : <<notified via SMS/WhatsApp>>
+
+' Admin Associations
+Admin --> UC_Auth
+Admin --> UC_AdminAudit
+Admin --> UC_SeedData
+
+' Include & Extend relationships
+UC_SOS ..> UC_GPS : <<include>>
+UC_SOS ..> UC_Alert : <<include>>
+UC_StartJourney ..> UC_GPS : <<include>>
+UC_StartJourney ..> UC_DetectAnomaly : <<extend>>
+UC_Distress ..> UC_SOS : <<extend: high danger>>
+UC_ReportIncident ..> UC_GenTimeline : <<include>>
+UC_GenTimeline ..> UC_ExportDossier : <<extend>>
+
+' Secondary Systems
+AI -- UC_DetectAnomaly
+AI -- UC_Distress
+AI -- UC_GenTimeline
+AI -- UC_Chatbot
+N8N -- UC_Alert
+
+@enduml
+
+@startuml suraksha_activity_diagram
+!theme plain
+skinparam roundcorner 8
+skinparam shadowing false
+skinparam defaultFontName "Arial"
+skinparam ActivityBackgroundColor #F3E8FF
+skinparam ActivityBorderColor #6D28D9
+skinparam ActivityDiamondBackgroundColor #EDE9FE
+skinparam ActivityDiamondBorderColor #7C3AED
+skinparam ArrowColor #4C1D95
+
+title **SURAKSHA - Journey Monitoring & SOS Activity Diagram**
+
+start
+
+:User specifies Source, Destination & Travel Mode;
+:Initialize Journey Record in MongoDB;
+:Activate Background Geolocation Tracking (30s loop);
+
+repeat
+    :Capture GPS Sensor Coordinates (lat, lng, accuracy);
+    :Send Checkpoint to FastAPI Backend;
+    :Calculate Haversine Distance against Expected Route;
+
+    if (Route Deviation > 500m OR Stoppage > 15 mins?) then (Yes - Anomaly Detected)
+        :Recalculate Dynamic Safety Score;
+        :Display In-App Alert: "Are You Safe?";
+        :Start 60-Second Safety Countdown;
+
+        if (User Response?) then (User Enters PIN / Confirms Safe)
+            :Re-route & Calibrate New Expected Trajectory;
+            :Log Acknowledged Safety Checkpoint;
+        else (Timeout (60s) OR User Clicks "Need Help")
+            :Auto-Escalate to Emergency SOS State;
+            fork
+                :AI Distress & Emergency Protocol Agent Activated;
+                :Synthesize Situation Summary & Google Maps Link;
+            fork again
+                :Trigger n8n Webhook Workflow;
+                :Dispatch SMS, WhatsApp & Email Alerts to Guardians;
+                :Queue Nearest Emergency Helplines (112, 100, 181);
+            end fork
+            :Activate High-Priority Emergency Active Screen;
+            :Broadcast Continuous Live Location Telemetry;
+            :Wait for User or Guardian De-escalation;
+            :Mark SOS Event as "Resolved";
+            stop
+        endif
+    else (No - Route Safe)
+        :Log Normal Route Checkpoint in Database;
+        :Maintain Journey Safety Score;
+    endif
+
+repeat while (Distance to Destination <= 100m?) is (No)
+->Yes;
+
+:Mark Journey Status as "Completed";
+:Compute Total Trip Duration & Final Safety Score;
+:Aggregate Daily Safety Analytics;
+
+stop
+
+@enduml
+
+@startuml suraksha_er_diagram
+!theme plain
+skinparam linetype ortho
+skinparam roundcorner 5
+skinparam shadowing false
+skinparam defaultFontName "Arial"
+skinparam ClassBackgroundColor #FAF5FF
+skinparam ClassBorderColor #6D28D9
+skinparam ClassHeaderBackgroundColor #EDE9FE
+
+title **SURAKSHA - Entity Relationship Diagram (MongoDB / Beanie ODM)**
+
+entity "User" as User {
+    * **_id** : ObjectId <<PK>>
+    --
+    * **email** : string <<UK>>
+    * **username** : string <<UK>>
+    * **password_hash** : string
+    * full_name : string
+    phone : string
+    role : string [user | guardian | admin]
+    safety_score : float
+    is_active : boolean
+    is_verified : boolean
+    profile_picture : string
+    emergency_contacts : list [embedded]
+    location : dict [lat, lng, address]
+    otp : string
+    otp_expiry : datetime
+    created_at : datetime
+    updated_at : datetime
+    last_login : datetime
+}
+
+entity "Guardian" as Guardian {
+    * **_id** : ObjectId <<PK>>
+    --
+    * **user_id** : string <<FK>>
+    * guardian_email : string
+    * guardian_name : string
+    guardian_phone : string
+    relationship : string
+    status : string [pending | active | declined]
+    notification_prefs : dict
+    created_at : datetime
+    updated_at : datetime
+}
+
+entity "Journey" as Journey {
+    * **_id** : ObjectId <<PK>>
+    --
+    * **user_id** : string <<FK>>
+    * source : string
+    * destination : string
+    source_coords : dict [lat, lng]
+    destination_coords : dict [lat, lng]
+    travel_mode : string
+    status : string [active | completed | emergency]
+    start_time : datetime
+    end_time : datetime
+    expected_duration : int
+    actual_duration : int
+    checkpoints : list [embedded]
+    deviations : list [embedded]
+    safety_score : float
+    ai_analysis : dict
+    created_at : datetime
+}
+
+entity "SOSEvent" as SOSEvent {
+    * **_id** : ObjectId <<PK>>
+    --
+    * **user_id** : string <<FK>>
+    * location : dict [lat, lng, address]
+    emergency_type : string
+    status : string [active | resolved | false_alarm]
+    message : string
+    ai_summary : string
+    notified_contacts : list [embedded]
+    response_time : int
+    resolved_at : datetime
+    resolved_by : string
+    created_at : datetime
+}
+
+entity "Incident" as Incident {
+    * **_id** : ObjectId <<PK>>
+    --
+    * **user_id** : string <<FK>>
+    * title : string
+    * description : string
+    incident_type : string
+    severity : string [low | medium | high | critical]
+    location : dict
+    status : string [open | under_review | resolved]
+    ai_timeline : list [embedded]
+    ai_summary : string
+    recommended_actions : list
+    tags : list
+    attachments : list
+    exported_formats : list
+    incident_time : datetime
+    created_at : datetime
+    updated_at : datetime
+}
+
+entity "Notification" as Notification {
+    * **_id** : ObjectId <<PK>>
+    --
+    * **user_id** : string <<FK>>
+    * type : string
+    * title : string
+    * message : string
+    is_read : boolean
+    metadata : dict
+    created_at : datetime
+}
+
+entity "Feedback" as Feedback {
+    * **_id** : ObjectId <<PK>>
+    --
+    * **user_id** : string <<FK>>
+    * feature : string
+    * rating : int [1-5]
+    comment : string
+    created_at : datetime
+}
+
+entity "Analytics" as Analytics {
+    * **_id** : ObjectId <<PK>>
+    --
+    * **user_id** : string <<FK>>
+    * date : string [YYYY-MM-DD]
+    safety_score : float
+    journeys_count : int
+    incidents_count : int
+    sos_count : int
+    ai_interactions : int
+    risk_level : string
+    completed_journeys : int
+    emergency_journeys : int
+    avg_journey_duration : float
+    created_at : datetime
+}
+
+' Relationships (Crow's Foot notation)
+User ||--o{ Guardian : "registers/trusts"
+User ||--o{ Journey : "embarks on"
+User ||--o{ SOSEvent : "triggers"
+User ||--o{ Incident : "reports"
+User ||--o{ Notification : "receives"
+User ||--o{ Feedback : "submits"
+User ||--o{ Analytics : "tracks daily"
+
+@enduml
+
+@startuml suraksha_sequence_diagram
+!theme plain
+autonumber
+skinparam responseMessageBelowArrow true
+skinparam roundcorner 5
+skinparam shadowing false
+skinparam defaultFontName "Arial"
+skinparam ParticipantBackgroundColor #EDE9FE
+skinparam ParticipantBorderColor #6D28D9
+skinparam ActorBorderColor #6D28D9
+skinparam ArrowColor #4C1D95
+skinparam BoxPadding 10
+
+title **SURAKSHA - Emergency SOS Multi-Agent Sequence Diagram**
+
+actor "👩 User\n(Commuter)" as User
+participant "🖥️ React App\n(Frontend)" as UI
+participant "🛡️ FastAPI\nGateway" as API
+participant "🤖 LangGraph\nEmergency Agent" as Agent
+database "🍃 MongoDB\n(Beanie ODM)" as DB
+participant "🔄 n8n Automation\nEngine" as N8N
+actor "👥 Guardians &\nHelplines" as Guardians
+
+User -> UI : Clicks "SOS EMERGENCY" Button
+activate UI
+
+UI -> UI : Query Browser Geolocation (lat, lng, address)
+UI -> API : POST /api/v1/sos\n{lat, lng, address, emergency_type: "assault"}
+activate API
+
+API -> DB : Insert SOSEvent(status="active", user_id, location)
+activate DB
+DB --> API : SOSEvent Record (sos_id: "sos_1092")
+deactivate DB
+
+API -> Agent : invoke_emergency_pipeline(sos_id, location, emergency_type)
+activate Agent
+
+note over Agent
+  **LangGraph 5-Step Pipeline:**
+  1. capture_situation() -> Protocol lookup (Priority: Critical)
+  2. generate_summary() -> AI synthesis + Maps URL
+  3. notify_contacts() -> Prepare SMS & Email templates
+  4. trigger_workflows() -> Format n8n payload
+  5. log_event() -> Estimate time to help (3-5 min)
+end note
+
+Agent -> Agent : Execute StateGraph Nodes
+Agent --> API : Return Structured Response {summary, priority, actions}
+deactivate Agent
+
+API -> DB : Update SOSEvent(ai_summary, notified_contacts)
+activate DB
+DB --> API : SOSEvent Updated
+deactivate DB
+
+par Async n8n Notification Dispatch
+    API -> N8N : POST /webhook/sos\n{sos_id, user_name, location, summary}
+    activate N8N
+    N8N -> Guardians : Dispatch WhatsApp Message with Live Map URL
+    N8N -> Guardians : Send Emergency SMS & Trigger Voice Call Alert
+    N8N -> DB : Log Automation Audit Entry
+    deactivate N8N
+else In-App Push Notification
+    API -> DB : Insert Notification for User & Guardians
+end
+
+API --> UI : 201 Created\n{emergency_id, status: "active", eta: "3-5 mins", summary}
+deactivate API
+
+UI -> UI : Activate Emergency Siren Audio & Fullscreen Banner
+UI -> User : Show Live Emergency Countdown & Helplines (112, 100)
+deactivate UI
+
+@enduml
